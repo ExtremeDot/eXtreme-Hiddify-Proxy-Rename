@@ -1,0 +1,515 @@
+html_content = """<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت و زیباسازی نام پروکسی‌های هیدیفای (نسخه پیشرفته)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap');
+        body { font-family: 'Vazirmatn', sans-serif; }
+        .resizable-box {
+            resize: vertical;
+            overflow: auto;
+            min-height: 250px;
+            max-height: 900px;
+        }
+        .custom-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-position: left 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 0.9em;
+            padding-left: 1.8rem !important;
+        }
+        .dark select, .dark select option {
+            background-color: #111827 !important;
+            color: #f3f4f6 !important; 
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 dark:bg-gray-950 dark:text-gray-100 light:bg-gray-50 light:text-gray-950 transition-colors duration-200 min-h-screen p-6 grid items-center">
+
+    <div class="max-w-[1750px] w-full mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 p-6 transition-colors duration-200">
+        
+        <header class="flex flex-col xl:flex-row justify-between items-start xl:items-center border-b border-gray-200 dark:border-b-gray-800 pb-4 mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400">⚙️ ابزار پیشرفته بازنویسی نام پروکسی‌های هیدیفای</h1>
+                <p class="text-gray-500 dark:text-gray-400 text-xs mt-1">تولید نام منحصر به فرد با آیکون + کدنیم دوحرفی + سیستم شماره‌گذاری هوشمند مجزا</p>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-4 w-full xl:w-auto justify-start xl:justify-end">
+                <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <span class="text-xs font-bold text-gray-600 dark:text-gray-400">🔍 بزرگنمایی آیکون:</span>
+                    <select id="zoom-changer" onchange="changeIconZoom(this.value)" class="bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-xs focus:outline-none font-medium">
+                        <option value="text-base" selected>حالت ۱ (استاندارد)</option>
+                        <option value="text-xl">حالت ۲ (بزرگ)</option>
+                        <option value="text-2xl">حالت ۳ (خیلی بزرگ)</option>
+                        <option value="text-4xl">حالت ۴ (۳ برابر)</option>
+                    </select>
+                </div>
+
+                <button onclick="toggleTheme()" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-700 px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-gray-800 dark:text-gray-200">
+                    <span id="theme-icon">🌙</span>
+                    <span id="theme-text">حالت تیره</span>
+                </button>
+                
+                <div id="file-badge" class="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-xs font-mono border border-gray-300 dark:border-gray-700">
+                    فایلی انتخاب نشده است
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            
+            <!-- ستون سایدبار (تنظیمات) -->
+            <div class="xl:col-span-1 space-y-4">
+                
+                <!-- بخش ۱: بارگذاری فایل -->
+                <div class="bg-gray-50 dark:bg-gray-800/60 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <h2 class="text-sm font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
+                        <span class="bg-blue-500/20 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded text-xs">1</span> بارگذاری فایل بکاپ (JSON)
+                    </h2>
+                    <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-lg cursor-pointer bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                        <div class="flex flex-col items-center justify-center text-center p-2">
+                            <span class="text-xl mb-1">📁</span>
+                            <p class="text-xs text-gray-500 dark:text-gray-400" id="upload-text">انتخاب فایل بکاپ هیدیفای</p>
+                        </div>
+                        <input id="backup-upload" type="file" accept=".json" class="hidden" />
+                    </label>
+                </div>
+
+                <!-- بخش ۲: الگوهای نام گذاری -->
+                <div class="bg-gray-50 dark:bg-gray-800/60 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <h2 class="text-sm font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
+                        <span class="bg-purple-500/20 text-purple-600 dark:text-purple-400 px-1.5 py-0.5 rounded text-xs">2</span> الگوهای آماده نام‌گذاری
+                    </h2>
+                    <div class="space-y-1.5 text-xs">
+                        <button onclick="setTemplate('full-icon')" class="w-full text-right bg-white dark:bg-gray-950 hover:bg-blue-500/10 border border-gray-300 dark:border-gray-800 hover:border-blue-500 p-2.5 rounded-lg transition flex justify-between items-center text-gray-700 dark:text-gray-200">
+                            <span>💎 آیکون | کد نام (کامل)</span>
+                            <span class="text-[10px] text-gray-400 dark:text-gray-500 font-mono">🛸 VL | 🌐 XH</span>
+                        </button>
+                        <button onclick="setTemplate('code-first')" class="w-full text-right bg-white dark:bg-gray-950 hover:bg-blue-500/10 border border-gray-300 dark:border-gray-800 hover:border-blue-500 p-2.5 rounded-lg transition flex justify-between items-center text-gray-700 dark:text-gray-200">
+                            <span>📌 کد نام | آیکون</span>
+                            <span class="text-[10px] text-gray-400 dark:text-gray-500 font-mono">CD-VL-XH</span>
+                        </button>
+                        <button onclick="setTemplate('icon-only')" class="w-full text-right bg-white dark:bg-gray-950 hover:bg-blue-500/10 border border-gray-300 dark:border-gray-800 hover:border-blue-500 p-2.5 rounded-lg transition flex justify-between items-center text-gray-700 dark:text-gray-200">
+                            <span>🌟 فقط آیکون</span>
+                            <span class="text-[10px] text-gray-400 dark:text-gray-500 font-mono">🛸 🌐 🎯</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- بخش ۳: فرمت ساختار نام -->
+                <div class="bg-gray-50 dark:bg-gray-800/60 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <h2 class="text-sm font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+                        <span class="bg-green-500/20 text-green-600 dark:text-green-400 px-1.5 py-0.5 rounded text-xs">3</span> ساختار فرمت خروجی نام
+                    </h2>
+                    <input type="text" dir="ltr" style="direction:ltr;" id="format-string" value="{num} {icon1} {code_cdn} | {icon2} {code_proto} | {icon3} {code_trans}" class="w-full bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-left font-mono text-xs focus:outline-none focus:border-blue-500">
+                    <p class="text-[10px] text-gray-400 mt-1">تگ <code class="text-amber-500">{num}</code> موقعیت شماره را مشخص می‌کند.</p>
+                </div>
+
+                <!-- بخش جدید: تنظیمات پیشرفته شماره‌گذاری هوشمند -->
+                <div class="bg-gray-50 dark:bg-gray-800/60 p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
+                    <h2 class="text-sm font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+                        <span class="bg-amber-500/20 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded text-xs">۴</span> سیستم شماره‌گذاری هوشمند
+                    </h2>
+                    
+                    <!-- فعال/غیرفعال سازی -->
+                    <div class="flex items-center justify-between bg-white dark:bg-gray-950 p-2.5 rounded-lg border border-gray-200 dark:border-gray-800">
+                        <span class="text-xs text-gray-700 dark:text-gray-200 font-medium">🔢 اختصاص شماره به کانفیگ‌ها:</span>
+                        <input type="checkbox" id="enable-numbering" checked onchange="toggleNumberingSection(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                    </div>
+
+                    <div id="numbering-options-container" class="space-y-3">
+                        <!-- روش شمارش -->
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 block">روش شمارش ردیف‌ها:</label>
+                            <select id="numbering-mode" onchange="updateNumberingModeHint()" class="w-full bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-lg px-2 py-1.5 text-xs focus:outline-none font-medium">
+                                <option value="per-route" selected>شروع مجدد از 1 برای هر مسیر (تفکیک شده)</option>
+                                <option value="continuous">شماره‌گذاری کل پروکسی‌ها به صورت متوالی</option>
+                            </select>
+                        </div>
+
+                        <!-- الگوهای آماده شماره گذاری -->
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 block">الگوهای آماده فرمت شماره:</label>
+                            <select id="numbering-template" onchange="applyNumberingTemplate(this.value)" class="w-full bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-lg px-2 py-1.5 text-xs focus:outline-none font-medium">
+                                <option value="style1" selected>حالت استاندارد ( 01 )</option>
+                                <option value="style2">داخل کروشه ( [01] )</option>
+                                <option value="style3">داخل پرانتز ( (01) )</option>
+                                <option value="style4">با هشتگ ( #01 )</option>
+                                <option value="custom">سفارشی (تنظیم دستی فیلدهای پایین)</option>
+                            </select>
+                        </div>
+
+                        <!-- تنظیم پیشوند و پسوند به تفکیک مسیر -->
+                        <div class="bg-white dark:bg-gray-950 p-2.5 rounded-lg border border-gray-200 dark:border-gray-800 space-y-2">
+                            <span class="text-[11px] font-bold text-amber-500 block">تنظیم فیلدهای ثابت ساختار شماره (Prefix/Postfix):</span>
+                            
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[10px] text-gray-400 block">پیشوند کلی (Prefix):</label>
+                                    <input type="text" id="num-prefix" value="" placeholder="مانند: No." class="w-full bg-gray-50 dark:bg-gray-900 text-xs text-center border border-gray-300 dark:border-gray-700 rounded p-1">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-gray-400 block">پسوند کلی (Postfix):</label>
+                                    <input type="text" id="num-postfix" value=" -" placeholder="مانند: -" class="w-full bg-gray-50 dark:bg-gray-900 text-xs text-center border border-gray-300 dark:border-gray-700 rounded p-1">
+                                </div>
+                            </div>
+                            
+                            <div class="pt-2 border-t border-gray-200 dark:border-gray-800 space-y-1.5">
+                                <label class="text-[10px] text-purple-400 block font-bold">پیشوند اختصاصی بر اساس نوع لایه اتصال:</label>
+                                <div class="space-y-1 text-[11px]">
+                                    <div class="flex items-center justify-between gap-1">
+                                        <span>Cloud/CDN:</span>
+                                        <input type="text" id="prefix-cdn" value="" placeholder="کدنیم" class="w-24 bg-gray-50 dark:bg-gray-900 text-xs text-center border border-gray-300 dark:border-gray-700 rounded p-0.5 font-mono">
+                                    </div>
+                                    <div class="flex items-center justify-between gap-1">
+                                        <span>Direct:</span>
+                                        <input type="text" id="prefix-direct" value="" placeholder="کدنیم" class="w-24 bg-gray-50 dark:bg-gray-900 text-xs text-center border border-gray-300 dark:border-gray-700 rounded p-0.5 font-mono">
+                                    </div>
+                                    <div class="flex items-center justify-between gap-1">
+                                        <span>Relay:</span>
+                                        <input type="text" id="prefix-relay" value="" placeholder="کدنیم" class="w-24 bg-gray-50 dark:bg-gray-900 text-xs text-center border border-gray-300 dark:border-gray-700 rounded p-0.5 font-mono">
+                                    </div>
+                                    <div class="flex items-center justify-between gap-1">
+                                        <span>Reality:</span>
+                                        <input type="text" id="prefix-reality" value="" placeholder="کدنیم" class="w-24 bg-gray-50 dark:bg-gray-900 text-xs text-center border border-gray-300 dark:border-gray-700 rounded p-0.5 font-mono">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ستون اصلی نمایش المان‌ها و پیش‌نمایش خروجی -->
+            <div class="xl:col-span-3 space-y-4">
+                
+                <div class="bg-gray-50 dark:bg-gray-800/60 p-5 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <h2 class="text-sm font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                        🎨 تفکیک هوشمند المان‌ها و کدنیم‌های فشرده ۲ حرفی در ۳ ستون مجزا
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-3">
+                            <div class="text-xs font-bold text-blue-600 dark:text-blue-400 border-b border-gray-300 dark:border-gray-700 pb-1.5 mb-2">🌐 مسیرها و لایه‌های اتصال</div>
+                            <div id="col-routes-container" class="space-y-3"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="text-xs font-bold text-purple-600 dark:text-purple-400 border-b border-gray-300 dark:border-gray-700 pb-1.5 mb-2">🔮 نوع پروتکل‌ها (Proto)</div>
+                            <div id="col-protocols-container" class="space-y-3"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="text-xs font-bold text-green-600 dark:text-green-400 border-b border-gray-300 dark:border-gray-700 pb-1.5 mb-2">⚡ نوع ترنسپورت و انتقال</div>
+                            <div id="col-transports-container" class="space-y-3"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="text-xs text-gray-500 dark:text-gray-400" id="status-message">منتظر بارگذاری فایل دیتابیس هیدیفای...</div>
+                        <div class="flex gap-3 w-full sm:w-auto">
+                            <button onclick="processProxyData()" id="btn-process" disabled class="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-600 text-white font-bold px-6 py-2.5 rounded-lg text-xs transition shadow-lg flex items-center justify-center gap-1.5">
+                                🔍 ۱. پردازش و اعمال الگوها
+                            </button>
+                            <button onclick="downloadModifiedJson()" id="btn-download" disabled class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-600 text-white font-bold px-6 py-2.5 rounded-lg text-xs transition shadow-lg flex items-center justify-center gap-1.5">
+                                📥 ۲. دانلود فایل اصلاح‌شده
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-800/60 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <h2 class="text-sm font-bold text-gray-800 dark:text-white mb-2 flex items-center justify-between">
+                        <span>👁️ لیست تغییرات نهایی فیلد Name در بخش Proxies</span>
+                        <span id="counter-badge" class="bg-white dark:bg-gray-950 text-blue-600 dark:text-blue-400 border border-gray-200 dark:border-gray-800 px-2 py-0.5 rounded text-xs font-mono">0 item</span>
+                    </h2>
+                    <div class="resizable-box bg-white dark:bg-gray-950 p-4 rounded-lg font-mono text-xs text-green-600 dark:text-green-400 border border-gray-200 dark:border-gray-800 space-y-1.5" id="preview-box">
+                        <div class="text-gray-400 dark:text-gray-600 italic">پس از بارگذاری فایل و کلیک بر روی پردازش، نام‌های جدید با اعمال قوانین شماره‌گذاری هوشمند در اینجا نمایش داده می‌شوند.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let rawJson = null;
+        let modifiedJson = null;
+        let currentZoomClass = "text-base"; 
+
+        const megaIconPool = [
+            "🛰️","🌀","☄️","💥","✔️","🎯","🔮","🛸","🔌","🧬","🌐","📦","🔼","🛡️","⚡","🔗","🧊","🎱","🥅","🏹","🥁","♟","🎲","🧩",
+            "🥇️","🥈","🥉️","🔸","🔹️","🔶","🔷","♾️","©️","®️","👁‍🗨","👁","〰️","➿️","✔️","🔛","💲","™️","💠","⚔️","🔅","🧿","🔐","🔒",
+            "🔓️","🔏️","📌️","📍","👻️","🕹","💯","⌛️","❄️","✳️","📶","☀️","⭐️","✨","🌨","🪩","⏏️","🔤","🔀","🔁","⏫","⏭️","📧","⏳",
+            "🚀","🚁","✈️","🗿","📀","🔑","💎","⚙️","🔍","🔴","🟢","🔵","🟣","🟠","🟡"
+        ];
+
+        const fieldsMetadata = [
+            // مسیرها
+            { id: "cdn", label: "CDN", default: "☁️", codename: "CD", type: "route" },
+            { id: "direct", label: "Direct", default: "🔌", codename: "DR", type: "route" },
+            { id: "relay", label: "Relay", default: "🔗", codename: "RL", type: "route" },
+            { id: "reality", label: "Reality", default: "🛡️", codename: "RE", type: "route" },
+
+            // پروتکل‌ها
+            { id: "vless", label: "VLESS", default: "🛸", codename: "VL", type: "protocol" },
+            { id: "vmess", label: "VMess", default: "🔮", codename: "VM", type: "protocol" },
+            { id: "trojan", label: "Trojan", default: "🐴", codename: "TR", type: "protocol" },
+            { id: "shadowsocks", label: "ShadowSocks", default: "👥", codename: "SS", type: "protocol" },
+            { id: "wireguard", label: "WireGuard", default: "🛡️", codename: "WG", type: "protocol" },
+            { id: "naive", label: "NaiveProxy", default: "🌐", codename: "NA", type: "protocol" },
+            { id: "hysteria", label: "Hysteria2", default: "⚡", codename: "HY", type: "protocol" },
+            { id: "tuic", label: "TUIC", default: "🚀", codename: "TU", type: "protocol" },
+            { id: "mieru", label: "Mieru", default: "🧊", codename: "MI", type: "protocol" },
+            { id: "shadowtls", label: "ShadowTLS", default: "🌑", codename: "ST", type: "protocol" },
+
+            // ترنسپورت‌ها
+            { id: "ws", label: "WebSocket", default: "🎯", codename: "WS", type: "transport" },
+            { id: "xhttp", label: "xHTTP / h3_quic", default: "🌐", codename: "XH", type: "transport" },
+            { id: "grpc", label: "gRPC", default: "🧪", codename: "GR", type: "transport" },
+            { id: "tcp", label: "TCP", default: "📦", codename: "TC", type: "transport" },
+            { id: "upgrade", label: "HTTP Upgrade", default: "🔼", codename: "UP", type: "transport" }
+        ];
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark'); html.classList.add('light');
+                icon.textContent = "☀️"; text.textContent = "حالت روشن";
+            } else {
+                html.classList.remove('light'); html.classList.add('dark');
+                icon.textContent = "🌙"; text.textContent = "حالت تیره";
+            }
+        }
+
+        function changeIconZoom(newClass) {
+            currentZoomClass = newClass;
+            document.querySelectorAll('select, input[id^="input-"]').forEach(el => {
+                el.className = el.className.replace(/text-(base|xl|2xl|4xl)/g, newClass);
+            });
+        }
+
+        function toggleNumberingSection(enabled) {
+            const container = document.getElementById('numbering-options-container');
+            if(enabled) {
+                container.style.opacity = "1";
+                container.style.pointerEvents = "auto";
+            } else {
+                container.style.opacity = "0.5";
+                container.style.pointerEvents = "none";
+            }
+        }
+
+        function applyNumberingTemplate(val) {
+            const prefix = document.getElementById('num-prefix');
+            const postfix = document.getElementById('num-postfix');
+            if (val === 'style1') { prefix.value = ""; postfix.value = " -"; }
+            else if (val === 'style2') { prefix.value = "["; postfix.value = "] "; }
+            else if (val === 'style3') { prefix.value = "("; postfix.value = ") "; }
+            else if (val === 'style4') { prefix.value = "#"; postfix.value = " "; }
+        }
+
+        function initSelectors() {
+            const colRoutes = document.getElementById('col-routes-container');
+            const colProtocols = document.getElementById('col-protocols-container');
+            const colTransports = document.getElementById('col-transports-container');
+
+            colRoutes.innerHTML = ''; colProtocols.innerHTML = ''; colTransports.innerHTML = '';
+
+            fieldsMetadata.forEach(meta => {
+                const wrapper = document.createElement('div');
+                wrapper.className = "bg-white dark:bg-gray-950 p-3 rounded-xl border border-gray-200 dark:border-gray-800";
+                wrapper.innerHTML = `
+                    <label class="text-xs font-bold text-gray-500 dark:text-gray-400 block mb-2">${meta.label}</label>
+                    <div class="flex gap-2">
+                        <select
+                            id="select-${meta.id}"
+                            onchange="syncIcon('${meta.id}')"
+                            class="custom-select flex-1 ${currentZoomClass} bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2">
+                            <option value="${meta.default}">${meta.default}</option>
+                            ${megaIconPool.map(i => `<option value="${i}">${i}</option>`).join('')}
+                        </select>
+                        <input id="input-${meta.id}" value="${meta.default}" class="${currentZoomClass} w-12 text-center border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900">
+                        <input id="codename-${meta.id}" value="${meta.codename}" maxlength="10" class="w-14 text-center text-xs font-mono border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-purple-600 dark:text-purple-400 font-bold">
+                    </div>
+                `;
+                if (meta.type === "route") colRoutes.appendChild(wrapper);
+                else if (meta.type === "protocol") colProtocols.appendChild(wrapper);
+                else colTransports.appendChild(wrapper);
+            });
+        }
+        
+        function syncIcon(id){
+            const select = document.getElementById(`select-${id}`);
+            const input = document.getElementById(`input-${id}`);
+            input.value = select.value;
+        }
+
+        function setTemplate(mode) {
+            const input = document.getElementById('format-string');
+            if (mode === 'full-icon') input.value = "{num}{icon1} {code_cdn} | {icon2} {code_proto} | {icon3} {code_trans}";
+            else if (mode === 'code-first') input.value = "{num}{code_cdn}{icon1} | {code_proto}{icon2} | {code_trans}{icon3}";
+            else if (mode === 'icon-only') input.value = "{num}{icon1} {icon2} {icon3}";
+        }
+
+        document.getElementById('backup-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            document.getElementById('file-badge').innerText = file.name;
+            document.getElementById('upload-text').innerText = "فایل لود شد";
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    rawJson = JSON.parse(evt.target.result);
+                    if (rawJson.proxies?.length) {
+                        document.getElementById('btn-process').disabled = false;
+                        document.getElementById('status-message').innerHTML = `<span class="text-green-600">✅ ${rawJson.proxies.length} کانفیگ لود شد</span>`;
+                    }
+                } catch (err) { alert("فایل JSON معتبر نیست!"); }
+            };
+            reader.readAsText(file);
+        });
+
+        function processProxyData() {
+            if (!rawJson?.proxies) return;
+            modifiedJson = JSON.parse(JSON.stringify(rawJson));
+            const formatPattern = document.getElementById('format-string').value;
+
+            // خوانی مقادیر از UI
+            const UI_Icons = {}, UI_Codenames = {};
+            fieldsMetadata.forEach(m => {
+                UI_Icons[m.id] = document.getElementById(`input-${m.id}`).value;
+                UI_Codenames[m.id] = document.getElementById(`codename-${m.id}`).value;
+            });
+
+            const isNumberingEnabled = document.getElementById('enable-numbering').checked;
+            const numberingMode = document.getElementById('numbering-mode').value;
+            
+            const globalPrefix = document.getElementById('num-prefix').value;
+            const globalPostfix = document.getElementById('num-postfix').value;
+            
+            const routePrefixes = {
+                cdn: document.getElementById('prefix-cdn').value,
+                direct: document.getElementById('prefix-direct').value,
+                relay: document.getElementById('prefix-relay').value,
+                reality: document.getElementById('prefix-reality').value
+            };
+
+            // تعریف کانترها
+            let globalCounter = 1;
+            const routeCounters = { cdn: 1, direct: 1, relay: 1, reality: 1 };
+
+            const previewBox = document.getElementById('preview-box');
+            previewBox.innerHTML = '';
+            const usedNames = new Set();
+
+            modifiedJson.proxies.forEach((proxy, idx) => {
+                const cdn = (proxy.cdn || 'direct').toLowerCase();
+                let proto = (proxy.proto || proxy.type || '').toLowerCase();
+                const transport = (proxy.transport || '').toLowerCase();
+                const l3 = (proxy.l3 || '').toLowerCase();
+
+                let icon1 = UI_Icons[cdn] || "🔌";
+                let code_cdn = UI_Codenames[cdn] || "DR";
+
+                let icon2 = UI_Icons.vless;
+                let code_proto = "VL";
+
+                if (proto.includes('wireguard')) { icon2 = UI_Icons.wireguard; code_proto = "WG"; }
+                else if (proto.includes('naive')) { icon2 = UI_Icons.naive || "🌐"; code_proto = "NA"; }
+                else if (proto.includes('hysteria')) { icon2 = UI_Icons.hysteria; code_proto = "HY"; }
+                else if (proto.includes('tuic')) { icon2 = UI_Icons.tuic; code_proto = "TU"; }
+                else if (proto.includes('mieru')) { icon2 = UI_Icons.mieru || "🧊"; code_proto = "MI"; }
+                else if (proto.includes('shadowtls')) { icon2 = UI_Icons.shadowtls || "🌑"; code_proto = "ST"; }
+                else if (proto === 'vmess') { icon2 = UI_Icons.vmess; code_proto = "VM"; }
+                else if (proto === 'trojan') { icon2 = UI_Icons.trojan; code_proto = "TR"; }
+                else if (proto === 'ss' || proto === 'shadowsocks') { icon2 = UI_Icons.shadowsocks; code_proto = "SS"; }
+
+                let icon3 = UI_Icons.tcp || "📦";
+                let code_trans = "TC";
+
+                if (transport === 'ws') { icon3 = UI_Icons.ws; code_trans = "WS"; }
+                else if (transport === 'xhttp' || l3.includes('h3')) { icon3 = UI_Icons.xhttp; code_trans = "XH"; }
+                else if (transport === 'grpc') { icon3 = UI_Icons.grpc; code_trans = "GR"; }
+                else if (transport === 'httpupgrade') { icon3 = UI_Icons.upgrade; code_trans = "UP"; }
+                else if (l3 === 'reality') { icon3 = UI_Icons.reality; code_trans = "RE"; }
+
+                // محاسبه و فرمت شماره
+                let numberString = "";
+                if (isNumberingEnabled) {
+                    let currentNum = 1;
+                    let specificPrefix = "";
+                    
+                    if (numberingMode === 'per-route') {
+                        currentNum = routeCounters[cdn] || 1;
+                        routeCounters[cdn]++;
+                        specificPrefix = routePrefixes[cdn] || "";
+                    } else {
+                        currentNum = globalCounter;
+                        globalCounter++;
+                        specificPrefix = "";
+                    }
+                    
+                    // دو رقمی کردن شماره‌ها کمتر از 10
+                    let formattedNum = currentNum < 10 ? "0" + currentNum : currentNum;
+                    numberString = `${globalPrefix}${specificPrefix}${formattedNum}${globalPostfix}`;
+                }
+
+                let finalName = formatPattern
+                    .replace(/{num}/g, numberString)
+                    .replace(/{icon1}/g, icon1)
+                    .replace(/{icon2}/g, icon2)
+                    .replace(/{icon3}/g, icon3)
+                    .replace(/{code_cdn}/g, code_cdn)
+                    .replace(/{code_proto}/g, code_proto)
+                    .replace(/{code_trans}/g, code_trans);
+
+                let uniqueName = finalName;
+                let dupCounter = 1;
+                while (usedNames.has(uniqueName)) {
+                    uniqueName = `${finalName} _${dupCounter++}`;
+                }
+                usedNames.add(uniqueName);
+
+                proxy.name = uniqueName;
+
+                const row = document.createElement('div');
+                row.className = "flex justify-between border-b border-gray-200 dark:border-gray-800 py-1 text-[11px]";
+                row.innerHTML = `<span class="text-gray-500">${idx+1}.</span><span class="text-amber-400 font-medium">${uniqueName}</span>`;
+                previewBox.appendChild(row);
+            });
+
+            document.getElementById('counter-badge').textContent = `${modifiedJson.proxies.length} item`;
+            document.getElementById('status-message').innerHTML = `<span class="text-green-600">✅ همه ${modifiedJson.proxies.length} کانفیگ با سیستم شماره‌گذاری هوشمند پردازش شدند.</span>`;
+            document.getElementById('btn-download').disabled = false;
+        }
+
+        function downloadModifiedJson() {
+            if (!modifiedJson) return;
+            const blob = new Blob([JSON.stringify(modifiedJson, null, 2)], {type: "application/json"});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "hiddify_proxies_renamed.json";
+            link.click();
+        }
+
+        initSelectors();
+    </script>
+</body>
+</html>
+"""
+
+with open("hiddify_advanced_renamer.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+print("File created successfully.")
